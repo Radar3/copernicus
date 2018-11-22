@@ -278,6 +278,7 @@ func TestQueueHeaders(t *testing.T) {
 	in := peer.NewInboundPeer(&config)
 	sm.Start()
 	sm.QueueHeaders(hdr, in)
+	sm.Stop()
 }
 
 func TestPause(t *testing.T) {
@@ -288,6 +289,7 @@ func TestPause(t *testing.T) {
 	defer os.RemoveAll(dir)
 	sm.Start()
 	sm.Pause() <- struct{}{}
+	sm.Stop()
 }
 
 func createBlkIdx() *blockindex.BlockIndex {
@@ -360,6 +362,7 @@ func TestSyncManager_handleBlockchainNotification(t *testing.T) {
 		}
 		sm.handleBlockchainNotification(notification)
 	}
+	sm.Stop()
 }
 
 func TestSyncManager_limitMap(t *testing.T) {
@@ -378,6 +381,7 @@ func TestSyncManager_limitMap(t *testing.T) {
 	assert.Equal(t, len(mp), 2)
 	sm.limitMap(mp, 2)
 	assert.Equal(t, len(mp), 1)
+	sm.Stop()
 }
 
 func TestSyncManager_findNextHeaderCheckpoint(t *testing.T) {
@@ -421,6 +425,7 @@ func TestSyncManager_findNextHeaderCheckpoint(t *testing.T) {
 	if ckPoint1 != nil {
 		t.Errorf("find next header checkPoint failed, ckPoint1:%v", ckPoint1)
 	}
+	sm.Stop()
 }
 
 type conn struct {
@@ -581,6 +586,7 @@ func TestSyncManager_isSyncCandidate(t *testing.T) {
 		//close connection
 		inPeer.Disconnect()
 	}
+	sm.Stop()
 }
 
 func TestSyncManager_alreadyHave(t *testing.T) {
@@ -599,6 +605,7 @@ func TestSyncManager_alreadyHave(t *testing.T) {
 	sm.rejectedTxns = rejectedTxns
 	ret = sm.alreadyHave(hash1)
 	assert.Equal(t, ret, true)
+	sm.Stop()
 }
 
 func TestSyncManager_handleInvMsg(t *testing.T) {
@@ -651,6 +658,7 @@ func TestSyncManager_handleInvMsg(t *testing.T) {
 	}
 
 	sm.handleInvMsg(invMsg2)
+	sm.Stop()
 }
 
 func ProcessBlockHeaderReturnErr(headerList []*block.BlockHeader, lastIndex *blockindex.BlockIndex) error {
@@ -724,6 +732,7 @@ func TestSyncManager_handleHeadersMsg(t *testing.T) {
 	sm.handleHeadersMsg(hmsg3)
 
 	sm.handleHeadersMsg(hmsg3)
+	sm.Stop()
 }
 
 func TestSyncManager_fetchHeaderBlocks(t *testing.T) {
@@ -754,6 +763,7 @@ func TestSyncManager_fetchHeaderBlocks(t *testing.T) {
 	sm.requestedBlocks = make(map[util.Hash]*peer.Peer)
 	sm.syncPeer = inpeer
 	sm.fetchHeaderBlocks(inpeer)
+	sm.Stop()
 }
 
 func TestSyncManager_updateTxRequestState(t *testing.T) {
@@ -774,10 +784,11 @@ func TestSyncManager_updateTxRequestState(t *testing.T) {
 	rejectedTxns = append(rejectedTxns, *hash1)
 
 	sm.updateTxRequestState(syncState, *hash1, rejectedTxns)
+	sm.Stop()
 }
 
 func TestSyncManager_fetchMissingTx(t *testing.T) {
-	_, dir, err := makeSyncManager()
+	sm, dir, err := makeSyncManager()
 	if err != nil {
 		t.Fatalf("construct syncmanager failed :%v\n", err)
 	}
@@ -791,6 +802,7 @@ func TestSyncManager_fetchMissingTx(t *testing.T) {
 	missTxs = append(missTxs, *hash2)
 
 	fetchMissingTx(missTxs, inpeer)
+	sm.Stop()
 }
 
 func TestSyncManager_handleBlockMsg(t *testing.T) {
@@ -846,6 +858,7 @@ func TestSyncManager_handleBlockMsg(t *testing.T) {
 	sm.handleBlockMsg(bmsg2)
 
 	sm.handleBlockMsg(bmsg2)
+	sm.Stop()
 }
 
 func ProcessTxAcceptAll(txn *tx.Tx, recentRejects map[util.Hash]struct{}, nodeID int64) ([]*tx.Tx, []util.Hash, []util.Hash, error) {
@@ -889,6 +902,7 @@ func TestSyncManager_handleTxMsg(t *testing.T) {
 	mempool.GetInstance().RemoveOrphansByTag(int64(inpeer.ID()))
 	sm.ProcessTransactionCallBack = service.ProcessTransaction
 	assert.NotPanics(t, func() { sm.handleTxMsg(tmsg) })
+	sm.Stop()
 }
 
 func generateBlocks(t *testing.T, generate int, maxTries uint64, verify bool) ([]*block.Block, error) {
@@ -999,8 +1013,6 @@ func initTestEnv() func() {
 	cleanup := func() {
 		os.RemoveAll(unitTestDataDirPath)
 		log.Debug("cleanup test dir: %s", unitTestDataDirPath)
-		gChain := chain.GetInstance()
-		*gChain = *chain.NewChain()
 	}
 
 	return cleanup
@@ -1076,6 +1088,7 @@ func TestSyncManager_NewPeer(t *testing.T) {
 	// old sync(2) < self(1), is not current
 	// syncPeer not change
 	assert.Equal(t, outPeer, sm.syncPeer)
+	sm.Stop()
 }
 
 func TestSyncManager_Current(t *testing.T) {
@@ -1097,6 +1110,7 @@ func TestSyncManager_Current(t *testing.T) {
 
 	// time of tip is now
 	assert.True(t, sm.current())
+	sm.Stop()
 }
 
 func TestSyncManager_DonePeer(t *testing.T) {
@@ -1116,4 +1130,5 @@ func TestSyncManager_DonePeer(t *testing.T) {
 
 	sm.syncPeer = inpeer
 	sm.handleDonePeerMsg(inpeer)
+	sm.Stop()
 }
