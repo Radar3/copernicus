@@ -183,6 +183,14 @@ var MainNetParams = BitcoinParams{
 		{343185, util.HashFromString("0000000000000000072b8bf361d01a6ba7d445dd024203fafc78768ed4368554")},
 		{352940, util.HashFromString("000000000000000010755df42dba556bb72be6a32f3ce0b6941ce4430152c9ff")},
 		{382320, util.HashFromString("00000000000000000a8dc6ed5b133d0eb2fd6af56203e4159789b092defd8ab2")},
+		// UAHF fork block.
+		{478558, util.HashFromString("0000000000000000011865af4122fe3b144e2cbeea86142e8ff2fb4107352d43")},
+		// Nov, 13 DAA activation block.
+		{504031, util.HashFromString("0000000000000000011ebf65b60d0a3de80b8175be709d653b4c1a1beeb6ab9c")},
+		// Monolith activation.
+		{530359, util.HashFromString("0000000000000000011ada8bd08f46074f44a8f155396f43e38acf9501c49103")},
+		// Magnetic anomaly activation.
+		{556767, util.HashFromString("0000000000000000004626ff6e3b936941d341c5932ece4357eeccac44e6d56c")},
 	},
 	MineBlocksOnDemands: false,
 	// Enforce current block version once majority of the network has
